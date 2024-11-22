@@ -1,4 +1,7 @@
+using Amazon.SecretsManager.Model;
+using Amazon.SecretsManager;
 using Microsoft.AspNetCore.Mvc;
+using Amazon;
 
 namespace BudgetManagementAPI.Controllers
 {
@@ -19,7 +22,7 @@ namespace BudgetManagementAPI.Controllers
         }
 
         [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        public async Task<IEnumerable<WeatherForecast>> Get()
         {
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {

@@ -1,4 +1,7 @@
 
+using BudgetManagementAPI.Database;
+using Microsoft.EntityFrameworkCore;
+
 namespace BudgetManagementAPI
 {
     public class Program
@@ -14,6 +17,9 @@ namespace BudgetManagementAPI
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.AddDbContext<BudgetDBContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -26,8 +32,7 @@ namespace BudgetManagementAPI
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
-
+          
             app.MapControllers();
 
             app.Run();
