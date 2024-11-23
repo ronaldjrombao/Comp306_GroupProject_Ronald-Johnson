@@ -1,6 +1,9 @@
-
+﻿
 using BudgetManagementAPI.Database;
+using BudgetManagementAPI.Security;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using BudgetManagementAPI.Controllers;
 
 namespace BudgetManagementAPI
 {
@@ -19,6 +22,17 @@ namespace BudgetManagementAPI
 
             builder.Services.AddDbContext<BudgetDBContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<BudgetDBContext>()
+                .AddDefaultTokenProviders();
+
+            // Add CORS policy
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins", policy =>
+                    policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            });
 
             var app = builder.Build();
 
@@ -28,6 +42,9 @@ namespace BudgetManagementAPI
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            // Configure middleware
+            app.UseCors("AllowAllOrigins");
 
             app.UseHttpsRedirection();
 
