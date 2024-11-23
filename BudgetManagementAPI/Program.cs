@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using BudgetManagementAPI.Controllers;
 using BudgetManagementAPI.Repository;
+using Microsoft.OpenApi.Models;
+using Humanizer;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace BudgetManagementAPI
 {
@@ -15,17 +18,23 @@ namespace BudgetManagementAPI
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(options => {
+                options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme {
+                    In = ParameterLocation.Header,
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey
+                });
+
+                options.OperationFilter<SecurityRequirementsOperationFilter>();
+            });
 
             builder.Services.AddDbContext<BudgetDBContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             
-            builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<BudgetDBContext>()
-                .AddDefaultTokenProviders();
+            builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
+                .AddEntityFrameworkStores<BudgetDBContext>();
 
             // Add CORS policy
             builder.Services.AddCors(options =>
@@ -37,9 +46,12 @@ namespace BudgetManagementAPI
             builder.Services.AddScoped(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
             builder.Services.AddScoped<IBudgetRepository, BudgetRepository>();
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+            builder.Services.AddControllers();
+
+            builder.Services.AddAuthorization();
 
             var app = builder.Build();
-
+            
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -52,9 +64,11 @@ namespace BudgetManagementAPI
 
             app.UseHttpsRedirection();
 
-            app.UseAuthorization();
-            
+            app.MapIdentityApi<ApplicationUser>();
+
             app.MapControllers();
+
+            app.UseAuthorization();
 
             app.Run();
         }

@@ -1,9 +1,7 @@
-using System.Diagnostics;
-using System.Security.Claims;
-using Amazon.Auth.AccessControlPolicy;
 using BudgetManagementAPI.Database.Entity;
 using BudgetManagementAPI.Repository;
 using BudgetManagementAPI.Security;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,7 +31,7 @@ namespace BudgetManagementAPI.Controllers
             this._userManager = userManager;
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
+        [HttpGet(Name = "GetWeatherForecast"), Authorize]
         public async Task<IEnumerable<WeatherForecast>> Get()
         {
             IEnumerable<Category> categories = await this.categoryRepository.FindAll();
