@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using BudgetManagementAPI.Security;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace BudgetManagementAPI.Database.Entity
@@ -19,7 +20,7 @@ namespace BudgetManagementAPI.Database.Entity
 
         public required DateTime EndDate { get; set; }
 
-        public required User Owner { get; set; }
+        public required ApplicationUser Owner { get; set; }
 
     }
 }
