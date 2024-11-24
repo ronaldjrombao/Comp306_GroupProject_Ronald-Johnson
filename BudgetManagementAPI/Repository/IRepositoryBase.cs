@@ -6,7 +6,7 @@ namespace BudgetManagementAPI.Repository
     {
         Task CreatAsync(T entity);
         Task UpdateAsync(T entity);
-        Task<IEnumerable<T>> FindAll();
+        IQueryable<T> FindAll();
         Task<IEnumerable<T>> FindAllByCondition(Expression<Func<T, bool>> filter);
         Task<T>? FindById(object id);
         Task DeleteByIdByAsync(object id);

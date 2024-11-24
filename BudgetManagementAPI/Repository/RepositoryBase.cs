@@ -52,8 +52,8 @@ public class RepositoryBase<T> : IRepositoryBase<T> where T: class
         await this._dbContext.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<T>> FindAll()
+    public IQueryable<T> FindAll()
     {
-        return await this.DbSet.ToListAsync<T>();
+        return this.DbSet;
     }
 }

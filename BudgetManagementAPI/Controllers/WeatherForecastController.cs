@@ -34,20 +34,6 @@ namespace BudgetManagementAPI.Controllers
         [HttpGet(Name = "GetWeatherForecast"), Authorize]
         public async Task<IEnumerable<WeatherForecast>> Get()
         {
-            IEnumerable<Category> categories = await this.categoryRepository.FindAll();
-            Category? category = categories.FirstOrDefault<Category>();
-            ApplicationUser? user = await this._userManager.GetUserAsync(HttpContext.User);
-            Budget newBudget = new() {
-                BudgetName = "No Spend Food",
-                Amount = 100.00m,
-                BudgetType = category,
-                StartDate = DateTime.Now,
-                EndDate = DateTime.Now,
-                Owner = user
-            };
-
-            await this.budgetRepository.CreatAsync(newBudget);
-
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
