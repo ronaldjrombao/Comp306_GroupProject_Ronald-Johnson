@@ -8,7 +8,7 @@ namespace BudgetManagementAPI.Database.Entity
     {
         public Budget() { }
         [Key]
-        public int BudgetId { get; set; }
+        public long BudgetId { get; set; }
     
         public required string BudgetName { get; set; }
 

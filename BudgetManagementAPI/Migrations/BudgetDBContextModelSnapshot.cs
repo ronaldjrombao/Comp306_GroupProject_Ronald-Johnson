@@ -24,11 +24,11 @@ namespace BudgetManagementAPI.Migrations
 
             modelBuilder.Entity("BudgetManagementAPI.Database.Entity.Budget", b =>
                 {
-                    b.Property<int>("BudgetId")
+                    b.Property<long>("BudgetId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BudgetId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("BudgetId"));
 
                     b.Property<decimal>("Amount")
                         .HasPrecision(18, 2)
@@ -41,13 +41,13 @@ namespace BudgetManagementAPI.Migrations
                     b.Property<long>("BudgetTypeCategoryId")
                         .HasColumnType("bigint");
 
-                    b.Property<DateOnly>("EndDate")
+                    b.Property<DateOnly?>("EndDate")
                         .HasColumnType("date");
 
                     b.Property<string>("OwnerId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateOnly>("StartDate")
+                    b.Property<DateOnly?>("StartDate")
                         .HasColumnType("date");
 
                     b.HasKey("BudgetId");
@@ -84,11 +84,11 @@ namespace BudgetManagementAPI.Migrations
 
             modelBuilder.Entity("BudgetManagementAPI.Database.Entity.Transaction", b =>
                 {
-                    b.Property<int>("BudgetId")
+                    b.Property<long>("TransactionId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BudgetId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("TransactionId"));
 
                     b.Property<decimal>("Amount")
                         .HasPrecision(18, 2)
@@ -103,7 +103,7 @@ namespace BudgetManagementAPI.Migrations
                     b.Property<long>("TransactionTypeCategoryId")
                         .HasColumnType("bigint");
 
-                    b.HasKey("BudgetId");
+                    b.HasKey("TransactionId");
 
                     b.HasIndex("OwnerId");
 

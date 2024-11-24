@@ -5,7 +5,7 @@ namespace BudgetManagementAPI.Dto.Budget
     public class PutBudgetDto
     {
         [Required]
-        public required int BudgetId { get; set; }
+        public required long BudgetId { get; set; }
 
         [Required]
         public required string BudgetName { get; set; }

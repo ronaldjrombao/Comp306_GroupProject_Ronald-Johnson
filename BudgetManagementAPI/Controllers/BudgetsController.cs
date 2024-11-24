@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using AutoMapper;
 using BudgetManagementAPI.Dto.Budget;
 using BudgetManagementAPI.Dto;
+using Microsoft.EntityFrameworkCore;
 
 namespace BudgetManagementAPI.Controllers
 {
@@ -41,7 +42,7 @@ namespace BudgetManagementAPI.Controllers
 
         // GET: api/Budgets/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Budget>> GetBudget(int id)
+        public async Task<ActionResult<Budget>> GetBudget(long id)
         {
             ApiResult<BudgetItem> result = new();
             ApplicationUser? user = await this.userManager.GetUserAsync(HttpContext.User);
@@ -63,7 +64,7 @@ namespace BudgetManagementAPI.Controllers
         // PUT: api/Budgets/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutBudget(int id, [FromBody] PutBudgetDto budget)
+        public async Task<IActionResult> PutBudget(long id, [FromBody] PutBudgetDto budget)
         {
             ApiResult<BudgetItem> apiResult = new();
 
@@ -75,6 +76,11 @@ namespace BudgetManagementAPI.Controllers
                 if (existing != null && existing.BudgetId == id)
                 {
                     existing = this.mapper.Map<PutBudgetDto, Budget>(budget, existing);
+
+                    Category newCategory = await this.categoryRepository.FindById(budget.BudgetType);
+
+                    existing.BudgetType = newCategory;
+
                     await this.budgetRepository.SaveChangesAsync();
                     apiResult.Message = "Budget Successfully updated";
                 } else
@@ -141,7 +147,15 @@ namespace BudgetManagementAPI.Controllers
 
                 if (existing != null && existing.BudgetId == id)
                 {
-                    existing = this.mapper.Map(budget, existing);
+
+                    if (budget.BudgetType != null)
+                    {
+                        Category newCategory = await this.categoryRepository.FindById(budget.BudgetType);
+                        existing.BudgetType = newCategory;
+                    }
+
+                    mapper.Map<PatchBudgetDto, Budget>(budget, existing);
+
                     await this.budgetRepository.SaveChangesAsync();
                     apiResult.Message = "Budget Successfully updated";
                 } else
@@ -161,7 +175,7 @@ namespace BudgetManagementAPI.Controllers
 
         //// DELETE: api/Budgets/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteBudget(int id)
+        public async Task<IActionResult> DeleteBudget(long id)
         {
             await this.budgetRepository.DeleteByIdByAsync(id);
             return NoContent();

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BudgetManagementAPI.Migrations
 {
     [DbContext(typeof(BudgetDBContext))]
-    [Migration("20241123035526_Intital")]
-    partial class Intital
+    [Migration("20241124172750_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,11 +27,11 @@ namespace BudgetManagementAPI.Migrations
 
             modelBuilder.Entity("BudgetManagementAPI.Database.Entity.Budget", b =>
                 {
-                    b.Property<int>("BudgetId")
+                    b.Property<long>("BudgetId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BudgetId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("BudgetId"));
 
                     b.Property<decimal>("Amount")
                         .HasPrecision(18, 2)
@@ -44,14 +44,14 @@ namespace BudgetManagementAPI.Migrations
                     b.Property<long>("BudgetTypeCategoryId")
                         .HasColumnType("bigint");
 
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly?>("EndDate")
+                        .HasColumnType("date");
 
                     b.Property<string>("OwnerId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly?>("StartDate")
+                        .HasColumnType("date");
 
                     b.HasKey("BudgetId");
 
@@ -87,25 +87,26 @@ namespace BudgetManagementAPI.Migrations
 
             modelBuilder.Entity("BudgetManagementAPI.Database.Entity.Transaction", b =>
                 {
-                    b.Property<int>("BudgetId")
+                    b.Property<long>("TransactionId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BudgetId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("TransactionId"));
 
                     b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("OwnerId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("TransactionDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("TransactionDate")
+                        .HasColumnType("date");
 
                     b.Property<long>("TransactionTypeCategoryId")
                         .HasColumnType("bigint");
 
-                    b.HasKey("BudgetId");
+                    b.HasKey("TransactionId");
 
                     b.HasIndex("OwnerId");
 

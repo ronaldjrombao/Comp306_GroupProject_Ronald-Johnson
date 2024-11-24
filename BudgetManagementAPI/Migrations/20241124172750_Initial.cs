@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BudgetManagementAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class Intital : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -174,13 +174,13 @@ namespace BudgetManagementAPI.Migrations
                 name: "Budgets",
                 columns: table => new
                 {
-                    BudgetId = table.Column<int>(type: "int", nullable: false)
+                    BudgetId = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     BudgetName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BudgetTypeCategoryId = table.Column<long>(type: "bigint", nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    StartDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    EndDate = table.Column<DateOnly>(type: "date", nullable: true),
                     OwnerId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
@@ -203,16 +203,16 @@ namespace BudgetManagementAPI.Migrations
                 name: "Transactions",
                 columns: table => new
                 {
-                    BudgetId = table.Column<int>(type: "int", nullable: false)
+                    TransactionId = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TransactionTypeCategoryId = table.Column<long>(type: "bigint", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TransactionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    TransactionDate = table.Column<DateOnly>(type: "date", nullable: false),
                     OwnerId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Transactions", x => x.BudgetId);
+                    table.PrimaryKey("PK_Transactions", x => x.TransactionId);
                     table.ForeignKey(
                         name: "FK_Transactions_AspNetUsers_OwnerId",
                         column: x => x.OwnerId,

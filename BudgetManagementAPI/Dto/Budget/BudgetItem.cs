@@ -7,7 +7,7 @@ namespace BudgetManagementAPI.Dto.Budget
 {
     public class BudgetItem
     {
-        public int BudgetId { get; set; }
+        public long BudgetId { get; set; }
 
         public required string BudgetName { get; set; }
 
