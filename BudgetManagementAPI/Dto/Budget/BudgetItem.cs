@@ -3,7 +3,7 @@ using BudgetManagementAPI.Security;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
-namespace BudgetManagementAPI.Dto
+namespace BudgetManagementAPI.Dto.Budget
 {
     public class BudgetItem
     {
@@ -15,9 +15,9 @@ namespace BudgetManagementAPI.Dto
 
         public required decimal Amount { get; set; }
 
-        public required DateTime StartDate { get; set; }
+        public required DateOnly StartDate { get; set; }
 
-        public required DateTime EndDate { get; set; }
+        public required DateOnly EndDate { get; set; }
 
     }
 }

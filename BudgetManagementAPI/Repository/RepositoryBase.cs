@@ -7,7 +7,7 @@ namespace BudgetManagementAPI.Repository;
 
 public class RepositoryBase<T> : IRepositoryBase<T> where T: class
 {
-    private readonly BudgetDBContext _dbContext;
+    public BudgetDBContext _dbContext { get; private set; }
     public DbSet<T> DbSet {get; private set;}
 
     public RepositoryBase(BudgetDBContext dbContext) {
@@ -15,10 +15,11 @@ public class RepositoryBase<T> : IRepositoryBase<T> where T: class
         this.DbSet = this._dbContext.Set<T>();
     }
 
-    public async Task CreatAsync(T entity)
+    public async Task<T> CreatAsync(T entity)
     {
         this.DbSet.Add(entity);
         await this.SaveChangesAsync();
+        return entity;
     }
 
     public async Task DeleteByIdByAsync(object id)
@@ -48,7 +49,7 @@ public class RepositoryBase<T> : IRepositoryBase<T> where T: class
         await this.SaveChangesAsync();
     }
 
-    private async Task SaveChangesAsync() {
+    public async Task SaveChangesAsync() {
         await this._dbContext.SaveChangesAsync();
     }
 

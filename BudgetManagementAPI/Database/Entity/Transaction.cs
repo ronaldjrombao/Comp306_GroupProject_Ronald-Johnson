@@ -14,7 +14,7 @@ namespace BudgetManagementAPI.Database.Entity
         [Precision(18, 2)]
         public required decimal Amount { get; set; }
 
-        public required DateTime TransactionDate { get; set; }
+        public required DateOnly TransactionDate { get; set; }
         
         public required ApplicationUser Owner { get; set; }
     }

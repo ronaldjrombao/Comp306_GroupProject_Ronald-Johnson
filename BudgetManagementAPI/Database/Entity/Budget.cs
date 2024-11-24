@@ -6,6 +6,7 @@ namespace BudgetManagementAPI.Database.Entity
 {
     public class Budget
     {
+        public Budget() { }
         [Key]
         public int BudgetId { get; set; }
     
@@ -16,9 +17,9 @@ namespace BudgetManagementAPI.Database.Entity
         [Precision(18, 2)]
         public required decimal Amount { get; set; }
 
-        public required DateTime StartDate { get; set; }
+        public required DateOnly? StartDate { get; set; }
 
-        public required DateTime EndDate { get; set; }
+        public required DateOnly? EndDate { get; set; }
 
         public required ApplicationUser Owner { get; set; }
 

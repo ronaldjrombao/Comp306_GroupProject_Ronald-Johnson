@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using BudgetManagementAPI.Database;
 using BudgetManagementAPI.Database.Entity;
 using Microsoft.AspNetCore.Authorization;
 using BudgetManagementAPI.Repository;
 using BudgetManagementAPI.Security;
 using Microsoft.AspNetCore.Identity;
+using AutoMapper;
+using BudgetManagementAPI.Dto.Budget;
 using BudgetManagementAPI.Dto;
 
 namespace BudgetManagementAPI.Controllers
@@ -17,50 +17,155 @@ namespace BudgetManagementAPI.Controllers
         private readonly IBudgetRepository budgetRepository;
         private readonly ICategoryRepository categoryRepository;
         private readonly UserManager<ApplicationUser> userManager;
-        public BudgetsController(IBudgetRepository budgetRepository, ICategoryRepository categoryRepository, UserManager<ApplicationUser> userManager)
+        private readonly IMapper mapper;
+        public BudgetsController(IBudgetRepository budgetRepository, 
+            ICategoryRepository categoryRepository,
+            UserManager<ApplicationUser> userManager,
+            IMapper mapper)
         {
             this.budgetRepository = budgetRepository;
             this.categoryRepository = categoryRepository;
             this.userManager = userManager;
+            this.mapper = mapper;
         }
 
         // GET: api/Budgets
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<BudgetItem>>> GetBudgets()
+        public async Task<ActionResult<ApiResult<IEnumerable<BudgetItem>>>> GetBudgets()
         {
+            ApiResult<IEnumerable<BudgetItem>> result = new();
             IEnumerable<BudgetItem> budgets = await this.budgetRepository.FindAllBudgetForUserAsync(this.userManager.GetUserId(HttpContext.User));
-            return Ok(budgets);
+            result.Results = budgets;
+            return Ok(result);
         }
 
-        //// GET: api/Budgets/5
-        //[HttpGet("{id}")]
-        //public async Task<ActionResult<Budget>> GetBudget(int id)
-        //{
-        //    return Ok(null);
-        //}
+        // GET: api/Budgets/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Budget>> GetBudget(int id)
+        {
+            ApiResult<BudgetItem> result = new();
+            ApplicationUser? user = await this.userManager.GetUserAsync(HttpContext.User);
+            Budget budget = await this.budgetRepository.FindBudgetByIdAndOwnerId(id, user.Id);
+            
+            if (budget != null && budget.Owner.Id == this.userManager.GetUserId(HttpContext.User))
+            {
+                BudgetItem budgetItem = this.mapper.Map<BudgetItem>(budget);
+                result.Results = budgetItem;
+                return Ok(result);
+            }
+            else
+            {
+                result.Message = "Budget Not Found";
+                return NotFound(result);   
+            }
+        }
 
-        //// PUT: api/Budgets/5
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutBudget(int id, Budget budget)
-        //{
-        //    return NoContent();
-        //}
+        // PUT: api/Budgets/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutBudget(int id, [FromBody] PutBudgetDto budget)
+        {
+            ApiResult<BudgetItem> apiResult = new();
 
-        //// POST: api/Budgets
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPost]
-        //public async Task<ActionResult<Budget>> PostBudget(Budget budget)
-        //{
-        //    return CreatedAtAction("GetBudget", new { id = budget.BudgetId }, budget);
-        //}
+            try
+            {
+                ApplicationUser? user = await this.userManager.GetUserAsync(HttpContext.User);
+                Budget? existing = await this.budgetRepository.FindBudgetByIdAndOwnerId(id, user.Id);
+
+                if (existing != null && existing.BudgetId == id)
+                {
+                    existing = this.mapper.Map<PutBudgetDto, Budget>(budget, existing);
+                    await this.budgetRepository.SaveChangesAsync();
+                    apiResult.Message = "Budget Successfully updated";
+                } else
+                {
+                    throw new Exception("Budget was not found or does not belong to the user.");
+                }
+
+                return Ok(apiResult);
+
+            }
+            catch (Exception ex)
+            {
+                apiResult.Message = ex.Message;
+                return BadRequest(apiResult);
+            }
+        }
+
+        // POST: api/Budgets
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<ActionResult<Budget>> PostBudget([FromBody] CreateBudgetDto budget)
+        {
+            ApiResult<BudgetItem> apiResult = new();
+            
+            try
+            {
+                Category category = await this.categoryRepository.FindById(budget.BudgetType);
+                ApplicationUser? user = await this.userManager.GetUserAsync(HttpContext.User);
+
+                Budget newBudget = new Budget() 
+                { 
+                    BudgetName = budget.BudgetName,
+                    Amount = budget.Amount,
+                    StartDate = budget.StartDate,
+                    EndDate = budget.EndDate,
+                    BudgetType = category,
+                    Owner = user
+                };
+
+                newBudget = await this.budgetRepository.CreatAsync(newBudget);
+                apiResult.Results = this.mapper.Map<BudgetItem>(newBudget);
+                apiResult.Message = "Budget Successfully Created";
+
+                return Ok(apiResult);
+
+            } catch (Exception ex)
+            {
+                apiResult.Message = ex.Message;
+                return BadRequest(apiResult);
+            }
+    }
+
+        // PATCH: api/Budgets/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PatchBudget(int id, [FromBody] PatchBudgetDto budget)
+        {
+            ApiResult<BudgetItem> apiResult = new();
+
+            try
+            {
+                ApplicationUser? user = await this.userManager.GetUserAsync(HttpContext.User);
+                Budget? existing = await this.budgetRepository.FindBudgetByIdAndOwnerId(id, user.Id);
+
+                if (existing != null && existing.BudgetId == id)
+                {
+                    existing = this.mapper.Map(budget, existing);
+                    await this.budgetRepository.SaveChangesAsync();
+                    apiResult.Message = "Budget Successfully updated";
+                } else
+                {
+                    throw new Exception("Budget was not found or does not belong to the user.");
+                }
+
+                return Ok(apiResult);
+
+            }
+            catch (Exception ex)
+            {
+                apiResult.Message = ex.Message;
+                return BadRequest(apiResult);
+            }
+        }
 
         //// DELETE: api/Budgets/5
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteBudget(int id)
-        //{
-        //    return NoContent();
-        //}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteBudget(int id)
+        {
+            await this.budgetRepository.DeleteByIdByAsync(id);
+            return NoContent();
+        }
 
     }
 }

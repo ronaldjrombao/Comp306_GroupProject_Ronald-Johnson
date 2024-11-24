@@ -8,6 +8,7 @@ using BudgetManagementAPI.Repository;
 using Microsoft.OpenApi.Models;
 using Humanizer;
 using Swashbuckle.AspNetCore.Filters;
+using BudgetManagementAPI.Mapper;
 
 namespace BudgetManagementAPI
 {
@@ -49,6 +50,8 @@ namespace BudgetManagementAPI
             builder.Services.AddControllers();
 
             builder.Services.AddAuthorization();
+
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
 
             var app = builder.Build();
             
