@@ -19,5 +19,7 @@ namespace BudgetManagementAPI.Dto.Budget
 
         public required DateOnly EndDate { get; set; }
 
+        public required decimal CurrentAmount { get; set; }
+
     }
 }

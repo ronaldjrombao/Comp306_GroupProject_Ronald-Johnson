@@ -47,10 +47,11 @@ namespace BudgetManagementAPI.Controllers
             ApiResult<BudgetItem> result = new();
             ApplicationUser? user = await this.userManager.GetUserAsync(HttpContext.User);
             Budget? budget = await this.budgetRepository.FindBudgetByIdAndOwnerId(id, user!.Id);
+            IEnumerable<BudgetItem> budgetItems = await this.budgetRepository.FindAllBudgetForUserAsync(user.Id, id);
             
-            if (budget != null && budget.Owner.Id == this.userManager.GetUserId(HttpContext.User))
+            if (budget != null && budget.Owner.Id == this.userManager.GetUserId(HttpContext.User) && budgetItems.Any())
             {
-                BudgetItem budgetItem = this.mapper.Map<BudgetItem>(budget);
+                BudgetItem? budgetItem = budgetItems.FirstOrDefault();
                 result.Results = budgetItem;
                 return Ok(result);
             }

@@ -10,7 +10,8 @@ namespace BudgetManagementAPI.Mapper
         public MappingProfile()
         {
             CreateMap<Budget, BudgetItem>()
-                .ForMember(dest => dest.BudgetType, opt => opt.MapFrom(src => src.BudgetType.CategoryName));
+                .ForMember(dest => dest.BudgetType, opt => opt.MapFrom(src => src.BudgetType.CategoryName))
+                .ForMember(dest => dest.CurrentAmount, opt => opt.Ignore());
             CreateMap<Transaction, TransactionItem>()
                 .ForMember(dest => dest.TransactionType, opt => opt.MapFrom(src => src.TransactionType.CategoryName));
             CreateMap<PutBudgetDto, Budget>()
