@@ -67,6 +67,8 @@ namespace BudgetManagementAPI
                 });
             }
 
+            builder.Services.AddHealthChecks();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -75,6 +77,8 @@ namespace BudgetManagementAPI
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            app.MapHealthChecks("/");
 
             // Configure middleware
             app.UseCors("AllowAllOrigins");
