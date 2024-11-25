@@ -21,8 +21,10 @@ namespace BudgetManagementAPI
             // Add services to the container.
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen(options => {
-                options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme {
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                {
                     In = ParameterLocation.Header,
                     Name = "Authorization",
                     Type = SecuritySchemeType.ApiKey
@@ -33,7 +35,7 @@ namespace BudgetManagementAPI
 
             builder.Services.AddDbContext<BudgetDBContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-            
+
             builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
                 .AddEntityFrameworkStores<BudgetDBContext>();
 
@@ -54,8 +56,19 @@ namespace BudgetManagementAPI
 
             builder.Services.AddAutoMapper(typeof(MappingProfile));
 
+            if (!builder.Environment.IsDevelopment())
+            {
+                builder.Configuration.AddSecretsManager(configurator: config =>
+                {
+                    config.SecretFilter = record => record.Name.StartsWith($"dev/Comp306DB");
+                    config.KeyGenerator = (secret, name) => name
+                                    .Replace("__", ":");
+                    config.PollingInterval = TimeSpan.FromSeconds(5);
+                });
+            }
+
             var app = builder.Build();
-            
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
