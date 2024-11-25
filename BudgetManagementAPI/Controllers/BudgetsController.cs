@@ -35,7 +35,7 @@ namespace BudgetManagementAPI.Controllers
         public async Task<ActionResult<ApiResult<IEnumerable<BudgetItem>>>> GetBudgets()
         {
             ApiResult<IEnumerable<BudgetItem>> result = new();
-            IEnumerable<BudgetItem> budgets = await this.budgetRepository.FindAllBudgetForUserAsync(this.userManager.GetUserId(HttpContext.User));
+            IEnumerable<BudgetItem> budgets = await this.budgetRepository.FindAllBudgetForUserAsync(this.userManager.GetUserId(HttpContext.User)!);
             result.Results = budgets;
             return Ok(result);
         }
@@ -46,7 +46,7 @@ namespace BudgetManagementAPI.Controllers
         {
             ApiResult<BudgetItem> result = new();
             ApplicationUser? user = await this.userManager.GetUserAsync(HttpContext.User);
-            Budget budget = await this.budgetRepository.FindBudgetByIdAndOwnerId(id, user.Id);
+            Budget? budget = await this.budgetRepository.FindBudgetByIdAndOwnerId(id, user!.Id);
             
             if (budget != null && budget.Owner.Id == this.userManager.GetUserId(HttpContext.User))
             {
@@ -71,13 +71,13 @@ namespace BudgetManagementAPI.Controllers
             try
             {
                 ApplicationUser? user = await this.userManager.GetUserAsync(HttpContext.User);
-                Budget? existing = await this.budgetRepository.FindBudgetByIdAndOwnerId(id, user.Id);
+                Budget? existing = await this.budgetRepository.FindBudgetByIdAndOwnerId(id, user!.Id);
 
                 if (existing != null && existing.BudgetId == id)
                 {
                     existing = this.mapper.Map<PutBudgetDto, Budget>(budget, existing);
 
-                    Category newCategory = await this.categoryRepository.FindById(budget.BudgetType);
+                    Category newCategory = await this.categoryRepository.FindById(budget.BudgetType)!;
 
                     existing.BudgetType = newCategory;
 
@@ -107,7 +107,7 @@ namespace BudgetManagementAPI.Controllers
             
             try
             {
-                Category category = await this.categoryRepository.FindById(budget.BudgetType);
+                Category category = await this.categoryRepository.FindById(budget.BudgetType)!;
                 ApplicationUser? user = await this.userManager.GetUserAsync(HttpContext.User);
 
                 Budget newBudget = new Budget() 
@@ -117,7 +117,7 @@ namespace BudgetManagementAPI.Controllers
                     StartDate = budget.StartDate,
                     EndDate = budget.EndDate,
                     BudgetType = category,
-                    Owner = user
+                    Owner = user!
                 };
 
                 newBudget = await this.budgetRepository.CreatAsync(newBudget);
@@ -143,14 +143,14 @@ namespace BudgetManagementAPI.Controllers
             try
             {
                 ApplicationUser? user = await this.userManager.GetUserAsync(HttpContext.User);
-                Budget? existing = await this.budgetRepository.FindBudgetByIdAndOwnerId(id, user.Id);
+                Budget? existing = await this.budgetRepository.FindBudgetByIdAndOwnerId(id, user!.Id);
 
                 if (existing != null && existing.BudgetId == id)
                 {
 
                     if (budget.BudgetType != null)
                     {
-                        Category newCategory = await this.categoryRepository.FindById(budget.BudgetType);
+                        Category newCategory = await this.categoryRepository.FindById(budget.BudgetType)!;
                         existing.BudgetType = newCategory;
                     }
 
