@@ -16,7 +16,7 @@ namespace BudgetManagementAPI
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            
             // Add services to the container.
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
@@ -30,9 +30,6 @@ namespace BudgetManagementAPI
 
                 options.OperationFilter<SecurityRequirementsOperationFilter>();
             });
-
-            builder.Services.AddDbContext<BudgetDBContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
                 .AddEntityFrameworkStores<BudgetDBContext>();
@@ -60,12 +57,15 @@ namespace BudgetManagementAPI
             {
                 builder.Configuration.AddSecretsManager(configurator: config =>
                 {
-                    config.SecretFilter = record => record.Name.StartsWith($"dev/Comp306DB");
+                    config.SecretFilter = record => record.Name.StartsWith($"ConnectionStrings__DefaultConnection");
                     config.KeyGenerator = (secret, name) => name
                                     .Replace("__", ":");
                     config.PollingInterval = TimeSpan.FromSeconds(5);
                 });
             }
+
+            builder.Services.AddDbContext<BudgetDBContext>(options =>
+                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.AddHealthChecks();
 

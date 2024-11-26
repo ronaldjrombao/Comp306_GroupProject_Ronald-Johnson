@@ -35,7 +35,7 @@ namespace TransactionManagementAPI.Controllers
         public async Task<ActionResult<ApiResult<IEnumerable<TransactionItem>>>> GetBudgets()
         {
             ApiResult<IEnumerable<TransactionItem>> result = new();
-            IEnumerable<TransactionItem> transactions = await this.transactionRepository.FindAllTransactionForUserAsync(this.userManager.GetUserId(HttpContext.User));
+            IEnumerable<TransactionItem> transactions = await this.transactionRepository.FindAllTransactionForUserAsync(this.userManager.GetUserId(HttpContext.User)!);
             result.Results = transactions;
             return Ok(result);
         }
@@ -46,7 +46,7 @@ namespace TransactionManagementAPI.Controllers
         {
             ApiResult<TransactionItem> result = new();
             ApplicationUser? user = await this.userManager.GetUserAsync(HttpContext.User);
-            Transaction transaction = await this.transactionRepository.FindTransactionByIdAndOwnerId(id, user.Id);
+            Transaction? transaction = await this.transactionRepository.FindTransactionByIdAndOwnerId(id, user!.Id);
 
             if (transaction != null && transaction.Owner.Id == this.userManager.GetUserId(HttpContext.User))
             {
@@ -71,12 +71,12 @@ namespace TransactionManagementAPI.Controllers
             try
             {
                 ApplicationUser? user = await this.userManager.GetUserAsync(HttpContext.User);
-                Transaction? existing = await this.transactionRepository.FindTransactionByIdAndOwnerId(id, user.Id);
+                Transaction? existing = await this.transactionRepository.FindTransactionByIdAndOwnerId(id, user!.Id);
 
                 if (existing != null && existing.TransactionId == id)
                 {
                     existing = this.mapper.Map<PutTransactionDto, Transaction>(transaction, existing);
-                    Category newCategory = await this.categoryRepository.FindById(transaction.TransactionType);
+                    Category newCategory = await this.categoryRepository.FindById(transaction.TransactionType)!;
                     existing.TransactionType = newCategory;
 
                     await this.transactionRepository.SaveChangesAsync();
@@ -106,7 +106,7 @@ namespace TransactionManagementAPI.Controllers
 
             try
             {
-                Category category = await this.categoryRepository.FindById(transaction.TransactionType);
+                Category category = await this.categoryRepository.FindById(transaction.TransactionType)!;
                 ApplicationUser? user = await this.userManager.GetUserAsync(HttpContext.User);
 
                 Transaction newTransaction = new Transaction()
@@ -114,7 +114,7 @@ namespace TransactionManagementAPI.Controllers
                     Amount = transaction.Amount,
                     TransactionDate = transaction.TransactionDate,
                     TransactionType = category,
-                    Owner = user
+                    Owner = user!
                 };
 
                 newTransaction = await this.transactionRepository.CreatAsync(newTransaction);
@@ -141,7 +141,7 @@ namespace TransactionManagementAPI.Controllers
             try
             {
                 ApplicationUser? user = await this.userManager.GetUserAsync(HttpContext.User);
-                Transaction? existing = await this.transactionRepository.FindTransactionByIdAndOwnerId(id, user.Id);
+                Transaction? existing = await this.transactionRepository.FindTransactionByIdAndOwnerId(id, user!.Id);
 
                 if (existing != null && existing.TransactionId == id)
                 {
@@ -149,7 +149,7 @@ namespace TransactionManagementAPI.Controllers
 
                     if (transaction.TransactionType != null)
                     {
-                        Category newCategory = await this.categoryRepository.FindById(transaction.TransactionType);
+                        Category newCategory = await this.categoryRepository.FindById(transaction.TransactionType)!;
                         existing.TransactionType= newCategory;
                     }
 

@@ -1,10 +1,7 @@
-using System;
-using System.Linq.Expressions;
 using AutoMapper;
 using BudgetManagementAPI.Database;
 using BudgetManagementAPI.Database.Entity;
 using BudgetManagementAPI.Dto.Budget;
-using BudgetManagementAPI.Security;
 using Microsoft.EntityFrameworkCore;
 
 namespace BudgetManagementAPI.Repository;
@@ -18,14 +15,43 @@ public class BudgetRepository : RepositoryBase<Budget>, IBudgetRepository
         this.mapper = mapper;
     }
 
-    public async Task<IEnumerable<BudgetItem>> FindAllBudgetForUserAsync(string userId)
+    public async Task<IEnumerable<BudgetItem>> FindAllBudgetForUserAsync(string userId, long? budgetId = null)
     {
         IQueryable<Budget> allBudget = this.FindAll();
-        IEnumerable<BudgetItem> budgets = await allBudget
-                                                        .Include(b => b.BudgetType)
-                                                        .Where(b => b.Owner.Id == userId)
-                                                        .Select(budget => this.mapper.Map<BudgetItem>(budget)).AsNoTracking().ToListAsync();
-        return budgets;
+        IList<BudgetItem> budgetItems = new List<BudgetItem>();
+        IEnumerable<Budget> budgets;
+
+        if (budgetId is not null)
+        {
+            budgets = await allBudget
+                        .Include(b => b.BudgetType)
+                        .Where(b => b.Owner.Id == userId)
+                        .Where(b => b.BudgetId == budgetId).AsNoTracking().ToListAsync();
+        }
+        else
+        {
+            budgets = await allBudget
+                        .Include(b => b.BudgetType)
+                        .Where(b => b.Owner.Id == userId).AsNoTracking().ToListAsync();
+        }
+
+        foreach (var budget in budgets)
+        {
+            var currentAmount = await this._dbContext.Transactions
+                .Where(t => t.Owner.Id == userId
+                        && t.TransactionDate >= budget.StartDate
+                        && t.TransactionDate <= budget.EndDate
+                        && t.TransactionType == budget.BudgetType).AsNoTracking()
+                .SumAsync(t => t.Amount);
+
+            var budgetItemDTO = this.mapper.Map<Budget, BudgetItem>(budget);
+
+            budgetItemDTO.CurrentAmount = currentAmount;
+            
+            budgetItems.Add(budgetItemDTO);
+        }
+
+        return budgetItems;
     }
 
     public async Task<Budget?> FindBudgetByIdAndOwnerId(long budgetId, string userId)
