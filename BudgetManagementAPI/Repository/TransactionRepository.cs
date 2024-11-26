@@ -25,7 +25,7 @@ public class TransactionRepository : RepositoryBase<Transaction>, ITransactionRe
         return transactions;
     }
 
-    public async Task<Transaction?> FindTransactionByIdAndOwnerId(int transactionId, string userId)
+    public async Task<Transaction?> FindTransactionByIdAndOwnerId(long transactionId, string userId)
     {
         IQueryable<Transaction> allTransaction = this.FindAll();
         Transaction? existing = await allTransaction

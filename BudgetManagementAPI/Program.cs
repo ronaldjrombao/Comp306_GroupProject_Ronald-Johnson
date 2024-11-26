@@ -1,5 +1,4 @@
-﻿
-using BudgetManagementAPI.Database;
+﻿using BudgetManagementAPI.Database;
 using BudgetManagementAPI.Security;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +18,6 @@ namespace BudgetManagementAPI
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
             {
@@ -39,11 +37,13 @@ namespace BudgetManagementAPI
             builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
                 .AddEntityFrameworkStores<BudgetDBContext>();
 
-            // Add CORS policy
+            // CORS Policy: Refined for specific origin (e.g., your frontend URL)
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowAllOrigins", policy =>
-                    policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+                options.AddPolicy("AllowSpecificOrigin", policy =>
+                    policy.WithOrigins("http://localhost:4200") // Change to your frontend URL
+                          .AllowAnyMethod()
+                          .AllowAnyHeader());
             });
 
             builder.Services.AddScoped(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
@@ -80,8 +80,8 @@ namespace BudgetManagementAPI
 
             app.MapHealthChecks("/");
 
-            // Configure middleware
-            app.UseCors("AllowAllOrigins");
+            // Use the specific CORS policy here
+            app.UseCors("AllowSpecificOrigin");
 
             app.UseHttpsRedirection();
 

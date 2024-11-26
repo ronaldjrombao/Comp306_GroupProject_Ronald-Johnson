@@ -64,7 +64,7 @@ namespace TransactionManagementAPI.Controllers
         // PUT: api/Transactions/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTransaction(int id, [FromBody] PutTransactionDto transaction)
+        public async Task<IActionResult> PutTransaction(long id, [FromBody] PutTransactionDto transaction)
         {
             ApiResult<TransactionItem> apiResult = new();
 
@@ -173,7 +173,7 @@ namespace TransactionManagementAPI.Controllers
 
         //// DELETE: api/Transactions/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTransaction(int id)
+        public async Task<IActionResult> DeleteTransaction(long id)
         {
             await this.transactionRepository.DeleteByIdByAsync(id);
             return NoContent();

@@ -7,5 +7,5 @@ namespace BudgetManagementAPI.Repository;
 public interface ITransactionRepository : IRepositoryBase<Transaction>
 {
     Task<IEnumerable<TransactionItem>> FindAllTransactionForUserAsync(string userId);
-    Task<Transaction?> FindTransactionByIdAndOwnerId(int transactionId, string userId);
+    Task<Transaction?> FindTransactionByIdAndOwnerId(long transactionId, string userId);
 }
