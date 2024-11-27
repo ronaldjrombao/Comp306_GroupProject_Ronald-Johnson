@@ -38,7 +38,7 @@ namespace BudgetManagementAPI
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowSpecificOrigin", policy =>
-                    policy.WithOrigins("http://localhost:4200") // Change to your frontend URL
+                    policy.WithOrigins("http://localhost:4200", "https://ronaldjro.dev") // Change to your frontend URL
                           .AllowAnyMethod()
                           .AllowAnyHeader());
             });
