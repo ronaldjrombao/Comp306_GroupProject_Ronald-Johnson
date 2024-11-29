@@ -29,6 +29,7 @@ namespace BudgetManagementAPI
                 });
 
                 options.OperationFilter<SecurityRequirementsOperationFilter>();
+                options.DocumentFilter<BasePathDocumentFilter>();
             });
 
             builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
