@@ -54,19 +54,8 @@ namespace BudgetManagementAPI
 
             builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-            if (!builder.Environment.IsDevelopment())
-            {
-                builder.Configuration.AddSecretsManager(configurator: config =>
-                {
-                    config.SecretFilter = record => record.Name.StartsWith($"ConnectionStrings__DefaultConnection");
-                    config.KeyGenerator = (secret, name) => name
-                                    .Replace("__", ":");
-                    config.PollingInterval = TimeSpan.FromSeconds(5);
-                });
-            }
-
             builder.Services.AddDbContext<BudgetDBContext>(options =>
-                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+                 options.UseSqlServer(builder.Configuration.GetConnectionString("BudgetDB")));
 
             builder.Services.AddHealthChecks();
 
