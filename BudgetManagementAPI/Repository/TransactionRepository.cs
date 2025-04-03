@@ -17,7 +17,8 @@ public class TransactionRepository : RepositoryBase<Transaction>, ITransactionRe
 
     public async Task<IEnumerable<TransactionItem>> FindAllTransactionForUserAsync(string userId)
     {
-        IQueryable<Transaction> allTransaction = this.FindAll();
+        IQueryable<Transaction> allTransaction = this._dbContext.Transactions;
+        
         IEnumerable<TransactionItem> transactions = await allTransaction
                                                         .Include(b => b.TransactionType)
                                                         .Where(b => b.Owner.Id == userId)
@@ -27,7 +28,7 @@ public class TransactionRepository : RepositoryBase<Transaction>, ITransactionRe
 
     public async Task<Transaction?> FindTransactionByIdAndOwnerId(long transactionId, string userId)
     {
-        IQueryable<Transaction> allTransaction = this.FindAll();
+        IQueryable<Transaction> allTransaction = this._dbContext.Transactions;
         Transaction? existing = await allTransaction
                                     .Include(b => b.Owner)
                                     .Where(b => b.Owner.Id == userId && transactionId == b.TransactionId)

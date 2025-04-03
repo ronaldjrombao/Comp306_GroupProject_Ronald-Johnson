@@ -11,9 +11,9 @@ namespace BudgetManagementAPI.Database
         
         }
 
-        public DbSet<Budget> Budgets {  get; set; }
-        public DbSet<Category> Category {  get; set; }
-        public DbSet<Transaction> Transactions {  get; set; }
+        public virtual DbSet<Budget> Budgets {  get; set; }
+        public virtual DbSet<Category> Category {  get; set; }
+        public virtual DbSet<Transaction> Transactions {  get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
