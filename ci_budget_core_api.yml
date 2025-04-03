@@ -9,7 +9,7 @@ variables:
   testProject: 'BudgetManagementAPI.Test'
   dockerHubRepo: 'ronaldjrombao/comp367group'
   dockerfilePath: './Dockerfile'
-  shortSha: $[format('{0}', variables['Build.SourceVersion'].Substring(0, 7))]
+  shortSha: $[substring(variables['Build.SourceVersion'], 0, 8)]
 
 stages:
 - stage: SonarQubeAnalysis
@@ -53,7 +53,6 @@ stages:
         pollingTimeoutSec: '300'
       displayName: 'Publish SonarQube Report'
 
-
 - stage: BuildAndPush
   displayName: Build & Push Docker Image
   dependsOn: SonarQubeAnalysis
@@ -65,9 +64,7 @@ stages:
       displayName: 'Login to Docker Hub'
       inputs:
         command: login
-        containerRegistry: ''
-        username: '$(DOCKER_USERNAME)'
-        password: '$(DOCKER_PASSWORD)'
+        containerRegistry: 'DockerHub'
 
     - task: Docker@2
       displayName: 'Build Docker Image'
