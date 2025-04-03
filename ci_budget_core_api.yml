@@ -6,9 +6,9 @@ pool:
 
 variables:
   projectName: 'BudgetManagementAPI'
-  testProject: 'BudgetManagementAPI.Tests'
-  dockerHubRepo: 'yourdockerhubusername/budgetmanagement-api'
-  dockerfilePath: 'BudgetManagementAPI/Dockerfile'
+  testProject: 'BudgetManagementAPI.Test'
+  dockerHubRepo: 'ronaldjrombao/comp367group'
+  dockerfilePath: './Dockerfile'
   shortSha: $[format('{0}', variables['Build.SourceVersion'].Substring(0, 7))]
 
 stages:
@@ -23,8 +23,17 @@ stages:
         packageType: 'sdk'
         version: '8.x.x'
 
-    - script: dotnet restore $(projectName)/$(projectName).csproj
-      displayName: 'Restore Dependencies'
+    - script: dotnet restore BudgetManagementAPI.sln
+      displayName: 'Restore Solution'
+
+    - task: SonarQubePrepare@7
+      inputs:
+        SonarQube: 'SonarqubeLocal'
+        scannerMode: 'dotnet'
+        projectKey: 'Comp367BudgetAPI'
+        projectName: 'Comp367BudgetAPI'
+        extraProperties: |
+          sonar.cs.opencover.reportsPaths=$(testProject)/TestResults/coverage.opencover.xml
 
     - script: dotnet build $(projectName)/$(projectName).csproj --no-incremental
       displayName: 'Build Project'
@@ -35,16 +44,6 @@ stages:
           /p:CoverletOutputFormat=opencover \
           /p:CoverletOutput=./TestResults/coverage.opencover.xml
       displayName: 'Run Tests with Coverage'
-    - task: SonarQubePrepare@7
-      inputs:
-        SonarQube: 'manual'
-        scannerMode: 'dotnet'
-        #configMode: 'manual'
-        serverUrl: 'http://localhost:9000'
-        token: '$(SONAR_TOKEN)'
-        extraProperties: |
-          sonar.projectKey=$(projectName)
-          sonar.cs.opencover.reportsPaths=$(testProject)/TestResults/coverage.opencover.xml
 
     - task: SonarQubeAnalyze@7
       displayName: 'Run SonarQube Analysis'
@@ -76,7 +75,7 @@ stages:
         command: build
         Dockerfile: $(dockerfilePath)
         tags: |
-          $(dockerHubRepo):latest
+          $(dockerHubRepo):api_latest
           $(dockerHubRepo):$(shortSha)
 
     - task: Docker@2
