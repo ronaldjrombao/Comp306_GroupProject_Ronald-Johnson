@@ -55,7 +55,6 @@ stages:
 
 - stage: BuildAndPush
   displayName: Build & Push Docker Image
-  dependsOn: SonarQubeAnalysis
   jobs:
   - job: DockerBuildPush
     displayName: Build and Push Docker Image
