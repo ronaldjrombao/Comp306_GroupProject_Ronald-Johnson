@@ -38,13 +38,12 @@ stages:
     - script: dotnet build $(projectName)/$(projectName).csproj --no-incremental
       displayName: 'Build Project'
 
-    - script: |
-        dotnet test $(testProject)/$(testProject).csproj \
-          /p:CollectCoverage=true \
-          /p:CoverletOutputFormat=opencover \
-          /p:CoverletOutput=./TestResults/coverage.opencover.xml
-      displayName: 'Run Tests with Coverage'
+    - script: mkdir $(testProject)\TestResults
+      displayName: 'Create TestResults Folder'
 
+    - script: dotnet test $(testProject)/$(testProject).csproj /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=./TestResults/coverage.opencover.xml
+      displayName: 'Run Tests with Coverage'
+      
     - task: SonarQubeAnalyze@7
       displayName: 'Run SonarQube Analysis'
 
