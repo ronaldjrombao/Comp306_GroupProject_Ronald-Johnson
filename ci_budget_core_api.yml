@@ -39,13 +39,8 @@ stages:
     - script: dotnet build Ombao_EjehComp306.sln --no-incremental
       displayName: 'Build Project'
 
-    - script: dotnet test $(testProject)/$(testProject).csproj --collect:"XPlat Code Coverage" --logger:"trx"
+    - script: dotnet test $(testProject)/$(testProject).csproj --collect:"XPlat Code Coverage;Format=cobertura,opencover" --logger:"trx"
       displayName: 'Run Tests with Coverage and TRX'
-
-    - script: dotnet tool install -g dotnet-reportgenerator-globaltool && reportgenerator -reports:"$(Build.SourcesDirectory)\**\coverage.cobertura.xml" -targetdir:"coverage-report" -reporttypes:Opencover
-      displayName: 'Convert Cobertura to OpenCover'
-      env:
-        PATH: $(PATH);$(USERPROFILE)\.dotnet\tools
 
     - task: PublishTestResults@2
       inputs:
