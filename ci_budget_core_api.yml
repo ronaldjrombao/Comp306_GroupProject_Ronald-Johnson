@@ -94,6 +94,7 @@ stages:
       displayName: 'Push Docker Image'
       inputs:
         command: push
+        repository: $(dockerHubRepo)
         tags: |
-          $(dockerHubRepo):latest
-          $(dockerHubRepo):$(shortSha)
+          api_latest
+          $(shortSha)
