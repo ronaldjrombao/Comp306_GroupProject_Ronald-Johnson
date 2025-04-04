@@ -24,13 +24,6 @@ stages:
         packageType: 'sdk'
         version: '8.0.407'
 
-    - script: |
-        echo "Build.SourceBranch: $(Build.SourceBranch)"
-        echo "Build.SourceBranchName: $(Build.SourceBranchName)"
-        echo "Build.Reason: $(Build.Reason)"
-        echo "System.PullRequest.SourceBranch: $(System.PullRequest.SourceBranch)"
-      displayName: 'Debug Branch Context'
-
     - script: dotnet restore Ombao_EjehComp306.sln
       displayName: 'Restore Solution'
 
@@ -50,15 +43,19 @@ stages:
     - script: mkdir $(testProject)\TestResults
       displayName: 'Create TestResults Folder'
 
-    - script: dotnet test $(testProject)/$(testProject).csproj --collect:"XPlat Code Coverage" --results-directory $(testProject)/TestResults
-      displayName: 'Run Tests with Coverage'
-      
-    - script: |
-        dotnet tool install -g dotnet-reportgenerator-globaltool
-        reportgenerator -reports:$(testProject)/TestResults/**/coverage.cobertura.xml -targetdir:coverage-report -reporttypes:Opencover
-      displayName: 'Convert Coverage to OpenCover format'
-      env:
-        PATH: $(PATH):$(HOME)/.dotnet/tools
+    - task: VSTest@3
+      displayName: 'Run Tests with Code Coverage'
+      inputs:
+        testSelector: 'testAssemblies'
+        testAssemblyVer2: |
+          $(testAssembly)
+          !**\*TestAdapter.dll
+          !**\obj\**
+        searchFolder: '$(System.DefaultWorkingDirectory)'
+        codeCoverageEnabled: true
+        platform: 'Any CPU'
+        configuration: 'Release'
+
     - task: SonarQubeAnalyze@7
       displayName: 'Run SonarQube Analysis'
 
