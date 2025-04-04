@@ -34,8 +34,6 @@ stages:
         scannerMode: 'dotnet'
         projectKey: 'Comp367BudgetAPI'
         projectName: 'Comp367BudgetAPI'
-        extraProperties: |
-          sonar.cs.opencover.reportsPaths=$(testProject)/TestResults/coverage.opencover.xml
           
     - script: dotnet build Ombao_EjehComp306.sln --no-incremental
       displayName: 'Build Project'
@@ -52,7 +50,15 @@ stages:
         codeCoverageEnabled: true
         platform: 'Any CPU'
         configuration: 'Release'
-
+    - task: PowerShell@2
+      displayName: 'Copy .trx to TestResults folder'
+      inputs:
+        targetType: 'inline'
+        script: |
+          $trxFiles = Get-ChildItem -Path "$(Agent.TempDirectory)" -Recurse -Filter *.trx
+          foreach ($file in $trxFiles) {
+            Copy-Item $file.FullName -Destination "C:\agent\_work\5\TestResults" -Force
+          }
     - task: SonarQubeAnalyze@7
       displayName: 'Run SonarQube Analysis'
 
