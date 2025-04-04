@@ -42,12 +42,10 @@ stages:
     - script: dotnet test $(testProject)/$(testProject).csproj --collect:"XPlat Code Coverage;Format=cobertura,opencover" --logger:"trx"
       displayName: 'Run Tests with Coverage and TRX'
 
-    - task: PublishCodeCoverageResults@1
+    - task: PublishCodeCoverageResults@2
       displayName: 'Publish Code Coverage to Azure DevOps'
       inputs:
-        codeCoverageTool: 'Cobertura'
         summaryFileLocation: '$(Build.SourcesDirectory)\BudgetManagementAPI.Test\TestResults\**\coverage.cobertura.xml'
-        reportDirectory: '$(Build.SourcesDirectory)\BudgetManagementAPI.Test\TestResults'
 
     - task: PublishTestResults@2
       inputs:
