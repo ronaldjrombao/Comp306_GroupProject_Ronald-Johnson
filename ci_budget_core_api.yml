@@ -21,7 +21,7 @@ stages:
     - task: UseDotNet@2
       inputs:
         packageType: 'sdk'
-        version: '8.x.x'
+        version: '8.0.14'
 
     - script: dotnet restore BudgetManagementAPI.sln
       displayName: 'Restore Solution'
