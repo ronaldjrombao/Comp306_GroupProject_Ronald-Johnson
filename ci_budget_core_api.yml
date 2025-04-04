@@ -34,7 +34,8 @@ stages:
         scannerMode: 'dotnet'
         projectKey: 'Comp367BudgetAPI'
         projectName: 'Comp367BudgetAPI'
-          
+        extraProperties: |
+          sonar.branch.name=
     - script: dotnet build Ombao_EjehComp306.sln --no-incremental
       displayName: 'Build Project'
 
