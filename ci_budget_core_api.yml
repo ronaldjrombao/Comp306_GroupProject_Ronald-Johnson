@@ -42,6 +42,18 @@ stages:
     - script: dotnet test $(testProject)/$(testProject).csproj --collect:"XPlat Code Coverage;Format=cobertura,opencover" --logger:"trx"
       displayName: 'Run Tests with Coverage and TRX'
 
+    - task: PowerShell@2
+      displayName: 'Move coverage reports to TestResults root'
+      inputs:
+        targetType: 'inline'
+        script: |
+          $coverageDir = "$(Build.SourcesDirectory)\BudgetManagementAPI.Test\TestResults"
+          $files = Get-ChildItem -Path $coverageDir -Recurse -Include coverage.cobertura.xml, coverage.opencover.xml
+          foreach ($file in $files) {
+            Write-Host "Moving $($file.FullName) to $coverageDir"
+            Move-Item -Path $file.FullName -Destination $coverageDir -Force
+          }
+          
     - task: PublishTestResults@2
       inputs:
         testResultsFormat: 'VSTest'
