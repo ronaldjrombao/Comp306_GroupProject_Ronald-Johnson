@@ -8,7 +8,7 @@ variables:
   projectName: 'BudgetManagementAPI'
   testProject: 'BudgetManagementAPI.Test'
   dockerHubRepo: 'ronaldjrombao/comp367group'
-  dockerfilePath: './Dockerfile'
+  dockerfilePath: './BudgetManagementAPI/Dockerfile'
   shortSha: $[substring(variables['Build.SourceVersion'], 0, 8)]
   testAssembly: '**\BudgetManagementAPI.Test.dll'
 
