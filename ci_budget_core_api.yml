@@ -13,6 +13,7 @@ variables:
 
 stages:
 - stage: SonarQubeAnalysis
+  condition: eq(variables['Build.SourceBranchName'], 'main')
   displayName: Code Analysis and Coverage
   jobs:
   - job: Analysis
