@@ -37,11 +37,8 @@ stages:
           sonar.cs.opencover.reportsPaths=$(testProject)/TestResults/coverage.opencover.xml
           sonar.branch.name=
           
-    - script: dotnet build $(projectName)/$(projectName).csproj --no-incremental
+    - script: dotnet build Ombao_EjehComp306.sln --no-incremental
       displayName: 'Build Project'
-
-    - script: mkdir $(testProject)\TestResults
-      displayName: 'Create TestResults Folder'
 
     - task: VSTest@3
       displayName: 'Run Tests with Code Coverage'
