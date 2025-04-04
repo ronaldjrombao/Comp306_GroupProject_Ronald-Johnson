@@ -34,7 +34,7 @@ stages:
         projectKey: 'Comp367BudgetAPI'
         projectName: 'Comp367BudgetAPI'
         extraProperties: |
-          sonar.cs.cobertura.reportsPaths=$(Build.SourcesDirectory)\**\coverage.cobertura.xml
+          sonar.cs.opencover.reportsPaths=$(Build.SourcesDirectory)\BudgetManagementAPI.Test\TestResults\coverage.opencover.xml
 
     - script: dotnet build Ombao_EjehComp306.sln --no-incremental
       displayName: 'Build Project'
@@ -53,7 +53,14 @@ stages:
             Write-Host "Moving $($file.FullName) to $coverageDir"
             Move-Item -Path $file.FullName -Destination $coverageDir -Force
           }
-          
+
+    - task: PublishCodeCoverageResults@1
+      displayName: 'Publish Code Coverage to Azure DevOps'
+      inputs:
+        codeCoverageTool: 'Cobertura'
+        summaryFileLocation: '$(Build.SourcesDirectory)\BudgetManagementAPI.Test\TestResults\coverage.cobertura.xml'
+        reportDirectory: '$(Build.SourcesDirectory)\BudgetManagementAPI.Test\TestResults'
+
     - task: PublishTestResults@2
       inputs:
         testResultsFormat: 'VSTest'
