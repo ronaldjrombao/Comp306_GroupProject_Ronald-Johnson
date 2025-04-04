@@ -41,7 +41,7 @@ stages:
       inputs:
         testSelector: 'testAssemblies'
         testAssemblyVer2: |
-          **\BudgetManagementAPI.Test.dll
+          **\BudgetManagementAPI.Test.csproj
         searchFolder: '$(System.DefaultWorkingDirectory)'
         resultsFolder: '$(Agent.BuildDirectory)\TestResults'
         runInParallel: true
