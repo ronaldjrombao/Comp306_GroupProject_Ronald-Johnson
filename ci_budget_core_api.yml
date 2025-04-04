@@ -10,6 +10,7 @@ variables:
   dockerHubRepo: 'ronaldjrombao/comp367group'
   dockerfilePath: './Dockerfile'
   shortSha: $[substring(variables['Build.SourceVersion'], 0, 8)]
+  testAssembly: '**\BudgetManagementAPI.Test.dll'
 
 stages:
 - stage: SonarQubeAnalysis
@@ -35,7 +36,6 @@ stages:
         projectName: 'Comp367BudgetAPI'
         extraProperties: |
           sonar.cs.opencover.reportsPaths=$(testProject)/TestResults/coverage.opencover.xml
-          sonar.branch.name=
           
     - script: dotnet build Ombao_EjehComp306.sln --no-incremental
       displayName: 'Build Project'
