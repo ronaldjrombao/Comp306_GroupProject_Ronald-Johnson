@@ -3,7 +3,6 @@ using BudgetManagementAPI.Database;
 using BudgetManagementAPI.Database.Entity;
 using BudgetManagementAPI.Dto.Budget;
 using Microsoft.EntityFrameworkCore;
-
 namespace BudgetManagementAPI.Repository;
 
 public class BudgetRepository : RepositoryBase<Budget>, IBudgetRepository
@@ -17,7 +16,7 @@ public class BudgetRepository : RepositoryBase<Budget>, IBudgetRepository
 
     public async Task<IEnumerable<BudgetItem>> FindAllBudgetForUserAsync(string userId, long? budgetId = null)
     {
-        IQueryable<Budget> allBudget = this.FindAll();
+        IQueryable<Budget> allBudget = _dbContext.Budgets;
         IList<BudgetItem> budgetItems = new List<BudgetItem>();
         IEnumerable<Budget> budgets;
 
@@ -56,7 +55,8 @@ public class BudgetRepository : RepositoryBase<Budget>, IBudgetRepository
 
     public async Task<Budget?> FindBudgetByIdAndOwnerId(long budgetId, string userId)
     {
-        IQueryable<Budget> allBudget = this.FindAll();
+        IQueryable<Budget> allBudget = this._dbContext.Budgets;
+        
         Budget? existing = await allBudget
                                 .Include(b => b.Owner)
                                 .Where(b => b.Owner.Id == userId && b.BudgetId == budgetId)

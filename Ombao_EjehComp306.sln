@@ -5,6 +5,8 @@ VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BudgetManagementAPI", "BudgetManagementAPI\BudgetManagementAPI.csproj", "{EB0CC78D-98DA-491E-97D2-C28EB0531930}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BudgetManagementAPI.Test", "BudgetManagementAPI.Test\BudgetManagementAPI.Test.csproj", "{318D0017-C61D-42AC-B849-86610AF44020}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{EB0CC78D-98DA-491E-97D2-C28EB0531930}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB0CC78D-98DA-491E-97D2-C28EB0531930}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB0CC78D-98DA-491E-97D2-C28EB0531930}.Release|Any CPU.Build.0 = Release|Any CPU
+		{318D0017-C61D-42AC-B849-86610AF44020}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{318D0017-C61D-42AC-B849-86610AF44020}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{318D0017-C61D-42AC-B849-86610AF44020}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{318D0017-C61D-42AC-B849-86610AF44020}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
