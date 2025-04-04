@@ -50,10 +50,7 @@ stages:
     - script: mkdir $(testProject)\TestResults
       displayName: 'Create TestResults Folder'
 
-    - script: |
-        dotnet test $(testProject)/$(testProject).csproj `
-          --collect:"XPlat Code Coverage" `
-          --results-directory ./TestResults
+    - script: dotnet test $(testProject)/$(testProject).csproj --collect:"XPlat Code Coverage" --results-directory ./TestResults
       displayName: 'Run Tests with Coverage'
       
     - script: |
