@@ -24,6 +24,13 @@ stages:
         packageType: 'sdk'
         version: '8.0.407'
 
+    - script: |
+        echo "Build.SourceBranch: $(Build.SourceBranch)"
+        echo "Build.SourceBranchName: $(Build.SourceBranchName)"
+        echo "Build.Reason: $(Build.Reason)"
+        echo "System.PullRequest.SourceBranch: $(System.PullRequest.SourceBranch)"
+      displayName: 'Debug Branch Context'
+
     - script: dotnet restore Ombao_EjehComp306.sln
       displayName: 'Restore Solution'
 
@@ -35,7 +42,8 @@ stages:
         projectName: 'Comp367BudgetAPI'
         extraProperties: |
           sonar.cs.opencover.reportsPaths=$(testProject)/TestResults/coverage.opencover.xml
-
+          sonar.branch.name=
+          
     - script: dotnet build $(projectName)/$(projectName).csproj --no-incremental
       displayName: 'Build Project'
 
