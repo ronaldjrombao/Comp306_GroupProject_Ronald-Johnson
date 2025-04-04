@@ -34,28 +34,10 @@ stages:
         projectKey: 'Comp367BudgetAPI'
         projectName: 'Comp367BudgetAPI'
         extraProperties: |
-          sonar.cs.opencover.reportsPaths="$(Build.SourcesDirectory)\BudgetManagementAPI.Test\TestResults\coverage.opencover.xml"
+          sonar.cs.opencover.reportsPaths="$(Build.SourcesDirectory)\BudgetManagementAPI.Test\TestResults\**\coverage.opencover.xml"
 
     - script: dotnet build Ombao_EjehComp306.sln --no-incremental
       displayName: 'Build Project'
-        
-    - script: dotnet test $(testProject)/$(testProject).csproj --collect:"XPlat Code Coverage;Format=cobertura,opencover" --logger:"trx"
-      displayName: 'Run Tests with Coverage and TRX'
-    - task: PowerShell@2
-      displayName: 'Move OpenCover Coverage File to Static Path'
-      inputs:
-        targetType: 'inline'
-        script: |
-          $testResultsPath = "$(Build.SourcesDirectory)\BudgetManagementAPI.Test\TestResults"
-          $source = Get-ChildItem -Path $testResultsPath -Recurse -Filter coverage.opencover.xml | Select-Object -First 1
-          $destination = Join-Path $testResultsPath "coverage.opencover.xml"
-          
-          if ($source) {
-            Write-Host "Moving coverage file from $($source.FullName) to $destination"
-            Move-Item -Path $source.FullName -Destination $destination -Force
-          } else {
-            Write-Warning "No coverage.opencover.xml file found under $testResultsPath"
-          }
 
     - task: PublishCodeCoverageResults@2
       displayName: 'Publish Code Coverage to Azure DevOps'
