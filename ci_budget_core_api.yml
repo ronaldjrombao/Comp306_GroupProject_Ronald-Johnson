@@ -37,6 +37,17 @@ stages:
     - script: dotnet build Ombao_EjehComp306.sln --no-incremental
       displayName: 'Build Project'
 
+    - task: VSTest@2
+      inputs:
+        testSelector: 'testAssemblies'
+        testAssemblyVer2: |
+          **\BudgetManagementAPI.Test.dll
+        searchFolder: '$(System.DefaultWorkingDirectory)'
+        resultsFolder: '$(Agent.BuildDirectory)\TestResults'
+        runInParallel: true
+        codeCoverageEnabled: true
+        diagnosticsEnabled: true
+        
     - script: dotnet test $(testProject)/$(testProject).csproj --collect:"XPlat Code Coverage;Format=cobertura,opencover" --logger:"trx"
       displayName: 'Run Tests with Coverage and TRX'
 
