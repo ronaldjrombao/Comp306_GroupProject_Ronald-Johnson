@@ -23,7 +23,7 @@ stages:
         packageType: 'sdk'
         version: '8.0.407'
 
-    - script: dotnet restore BudgetManagementAPI/BudgetManagementAPI.sln
+    - script: dotnet restore Ombao_EjehComp306.sln
       displayName: 'Restore Solution'
 
     - task: SonarQubePrepare@7
