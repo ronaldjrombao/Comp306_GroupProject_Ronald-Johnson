@@ -34,31 +34,27 @@ stages:
         projectKey: 'Comp367BudgetAPI'
         projectName: 'Comp367BudgetAPI'
         extraProperties: |
-          sonar.branch.name=
+          sonar.cs.opencover.reportsPaths=$(Build.SourcesDirectory)\coverage-report\coverage.opencover.xml
+
     - script: dotnet build Ombao_EjehComp306.sln --no-incremental
       displayName: 'Build Project'
 
-    - task: VSTest@3
-      displayName: 'Run Tests with Code Coverage'
+    - script: dotnet test $(testProject)/$(testProject).csproj --collect:"XPlat Code Coverage" --logger:"trx"
+      displayName: 'Run Tests with Coverage and TRX'
+
+    - script: dotnet tool install -g dotnet-reportgenerator-globaltool && reportgenerator -reports:"$(Build.SourcesDirectory)\**\coverage.cobertura.xml" -targetdir:"coverage-report" -reporttypes:Opencover
+      displayName: 'Convert Cobertura to OpenCover'
+      env:
+        PATH: $(PATH);$(USERPROFILE)\.dotnet\tools
+
+    - task: PublishTestResults@2
       inputs:
-        testSelector: 'testAssemblies'
-        testAssemblyVer2: |
-          $(testAssembly)
-          !**\*TestAdapter.dll
-          !**\obj\**
-        searchFolder: '$(System.DefaultWorkingDirectory)'
-        codeCoverageEnabled: true
-        platform: 'Any CPU'
-        configuration: 'Release'
-    - task: PowerShell@2
-      displayName: 'Copy .trx to TestResults folder'
-      inputs:
-        targetType: 'inline'
-        script: |
-          $trxFiles = Get-ChildItem -Path "$(Agent.TempDirectory)" -Recurse -Filter *.trx
-          foreach ($file in $trxFiles) {
-            Copy-Item $file.FullName -Destination "C:\agent\_work\5\TestResults" -Force
-          }
+        testResultsFormat: 'VSTest'
+        testResultsFiles: '**/*.trx'
+        searchFolder: '$(Build.SourcesDirectory)'
+        failTaskOnMissingResultsFile: true
+      displayName: 'Publish .trx Test Results'
+
     - task: SonarQubeAnalyze@7
       displayName: 'Run SonarQube Analysis'
 
