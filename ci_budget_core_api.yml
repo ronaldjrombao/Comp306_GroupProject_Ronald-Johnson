@@ -36,17 +36,6 @@ stages:
 
     - script: dotnet build Ombao_EjehComp306.sln --no-incremental
       displayName: 'Build Project'
-
-    - task: VSTest@2
-      inputs:
-        testSelector: 'testAssemblies'
-        testAssemblyVer2: |
-          **\BudgetManagementAPI.Test.csproj
-        searchFolder: '$(System.DefaultWorkingDirectory)'
-        resultsFolder: '$(Agent.BuildDirectory)\TestResults'
-        runInParallel: true
-        codeCoverageEnabled: true
-        diagnosticsEnabled: true
         
     - script: dotnet test $(testProject)/$(testProject).csproj --collect:"XPlat Code Coverage;Format=cobertura,opencover" --logger:"trx"
       displayName: 'Run Tests with Coverage and TRX'
@@ -62,7 +51,7 @@ stages:
         testResultsFiles: '**/*.trx'
         searchFolder: '$(Build.SourcesDirectory)'
         failTaskOnMissingResultsFile: true
-      displayName: 'Publish .trx Test Results'
+      displayName: 'Publish Test Results'
 
     - task: SonarQubeAnalyze@7
       displayName: 'Run SonarQube Analysis'
@@ -93,7 +82,7 @@ stages:
         repository: $(dockerHubRepo)
         tags: |
           api_latest
-          api_$(shortSha
+          api_$(shortSha)
 
     - task: Docker@2
       displayName: 'Push Docker Image'
