@@ -36,10 +36,10 @@ stages:
         extraProperties: |
           sonar.cs.opencover.reportsPaths="$(Build.SourcesDirectory)\BudgetManagementAPI.Test\TestResults\**\coverage.opencover.xml"
 
-    - script: dotnet build Ombao_EjehComp306.sln --no-incremental
+    - script: dotnet build Ombao_EjehComp306.sln --no-incremental -c Debug
       displayName: 'Build Project'
 
-    - script: dotnet test $(testProject)/$(testProject).csproj --collect:"XPlat Code Coverage;Format=cobertura,opencover" --logger:"trx"
+    - script: dotnet test $(testProject)/$(testProject).csproj --collect:"XPlat Code Coverage;Format=cobertura,opencover" --logger:"trx" -c Debug
       displayName: 'Run Tests with Coverage and TRX'
       
     - task: PublishCodeCoverageResults@2
