@@ -8,13 +8,12 @@ variables:
   projectName: 'BudgetManagementAPI'
   testProject: 'BudgetManagementAPI.Test'
   dockerHubRepo: 'ronaldjrombao/comp367group'
-  dockerfilePath: './BudgetManagementAPI/Dockerfile'
+  dockerfilePath: './Dockerfile'
   shortSha: $[substring(variables['Build.SourceVersion'], 0, 8)]
   testAssembly: '**\BudgetManagementAPI.Test.dll'
 
 stages:
 - stage: SonarQubeAnalysis
-  condition: eq(variables['Build.SourceBranchName'], 'main')
   displayName: Code Analysis and Coverage
   jobs:
   - job: Analysis
@@ -35,31 +34,27 @@ stages:
         projectKey: 'Comp367BudgetAPI'
         projectName: 'Comp367BudgetAPI'
         extraProperties: |
-          sonar.branch.name=
-    - script: dotnet build Ombao_EjehComp306.sln --no-incremental
+          sonar.cs.opencover.reportsPaths="$(Build.SourcesDirectory)\BudgetManagementAPI.Test\TestResults\**\coverage.opencover.xml"
+
+    - script: dotnet build Ombao_EjehComp306.sln --no-incremental -c Debug
       displayName: 'Build Project'
 
-    - task: VSTest@3
-      displayName: 'Run Tests with Code Coverage'
+    - script: dotnet test $(testProject)/$(testProject).csproj --collect:"XPlat Code Coverage;Format=cobertura,opencover" --logger:"trx" -c Debug
+      displayName: 'Run Tests with Coverage and TRX'
+      
+    - task: PublishCodeCoverageResults@2
+      displayName: 'Publish Code Coverage to Azure DevOps'
       inputs:
-        testSelector: 'testAssemblies'
-        testAssemblyVer2: |
-          $(testAssembly)
-          !**\*TestAdapter.dll
-          !**\obj\**
-        searchFolder: '$(System.DefaultWorkingDirectory)'
-        codeCoverageEnabled: true
-        platform: 'Any CPU'
-        configuration: 'Release'
-    - task: PowerShell@2
-      displayName: 'Copy .trx to TestResults folder'
+        summaryFileLocation: '$(Build.SourcesDirectory)\BudgetManagementAPI.Test\TestResults\**\coverage.cobertura.xml'
+
+    - task: PublishTestResults@2
       inputs:
-        targetType: 'inline'
-        script: |
-          $trxFiles = Get-ChildItem -Path "$(Agent.TempDirectory)" -Recurse -Filter *.trx
-          foreach ($file in $trxFiles) {
-            Copy-Item $file.FullName -Destination "C:\agent\_work\5\TestResults" -Force
-          }
+        testResultsFormat: 'VSTest'
+        testResultsFiles: '**/*.trx'
+        searchFolder: '$(Build.SourcesDirectory)'
+        failTaskOnMissingResultsFile: true
+      displayName: 'Publish Test Results'
+
     - task: SonarQubeAnalyze@7
       displayName: 'Run SonarQube Analysis'
 
@@ -70,6 +65,7 @@ stages:
 
 - stage: BuildAndPush
   displayName: Build & Push Docker Image
+  condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
   dependsOn: SonarQubeAnalysis
   jobs:
   - job: DockerBuildPush
@@ -86,14 +82,16 @@ stages:
       inputs:
         command: build
         Dockerfile: $(dockerfilePath)
+        repository: $(dockerHubRepo)
         tags: |
-          $(dockerHubRepo):api_latest
-          $(dockerHubRepo):$(shortSha)
+          api_latest
+          api_$(shortSha)
 
     - task: Docker@2
       displayName: 'Push Docker Image'
       inputs:
         command: push
+        repository: $(dockerHubRepo)
         tags: |
-          $(dockerHubRepo):latest
-          $(dockerHubRepo):$(shortSha)
+          api_latest
+          api_$(shortSha)
