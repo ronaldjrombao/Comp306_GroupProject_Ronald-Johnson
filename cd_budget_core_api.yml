@@ -1,0 +1,42 @@
+trigger: none
+
+pool:
+  name: "Comp367_SH_Agent"
+
+variables:
+  dockerHubRepo: 'ronaldjrombao/comp367group'
+  shortSha: $[substring(variables['Build.SourceVersion'], 0, 8)]
+  containerName: 'budget-api'
+  networkName: 'comp367-net'
+  exposedPort: '8080'
+
+stages:
+- stage: DeployAPI
+  displayName: Deploy API via Docker
+  jobs:
+    - job: DeployJob
+      steps:
+        - task: Docker@2
+          displayName: 'Login to Docker Hub'
+          inputs:
+            command: login
+            containerRegistry: 'DockerHub'
+
+        - script: |
+            echo "Creating Docker network if not exists..."
+            docker network inspect $(networkName) >/dev/null 2>&1 || docker network create $(networkName)
+          displayName: 'Ensure Docker Network Exists'
+
+        - script: |
+            echo "Stopping and removing existing container if any..."
+            docker rm -f $(containerName) || echo "No container to remove."
+
+            echo "Pulling latest image..."
+            docker pull $(dockerHubRepo):api_latest
+
+            echo "Running container..."
+            docker run -d --name $(containerName) `
+              --network $(networkName) `
+              -p $(exposedPort):8080 `
+              $(dockerHubRepo):api_latest
+          displayName: 'Deploy API Container'
