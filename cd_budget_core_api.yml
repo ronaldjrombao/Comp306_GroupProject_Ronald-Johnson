@@ -23,9 +23,16 @@ stages:
             containerRegistry: 'DockerHub'
 
         - script: |
-            echo "Creating Docker network if not exists..."
-            docker network inspect $(networkName) >/dev/null 2>&1 || docker network create $(networkName)
+            echo "Creating Docker network if it does not exist..."
+            docker network inspect $(networkName) >nul 2>&1
+            if errorlevel 1 (
+              echo "Network does not exist. Creating..."
+              docker network create $(networkName)
+            ) else (
+              echo "Network $(networkName) already exists."
+            )
           displayName: 'Ensure Docker Network Exists'
+          
         - script: |
             echo "Stopping and removing existing container if any..."
             docker rm -f $(containerName) || echo "No container to remove."
