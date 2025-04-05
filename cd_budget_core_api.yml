@@ -26,7 +26,6 @@ stages:
             echo "Creating Docker network if not exists..."
             docker network inspect $(networkName) >/dev/null 2>&1 || docker network create $(networkName)
           displayName: 'Ensure Docker Network Exists'
-
         - script: |
             echo "Stopping and removing existing container if any..."
             docker rm -f $(containerName) || echo "No container to remove."
@@ -35,8 +34,5 @@ stages:
             docker pull $(dockerHubRepo):api_latest
 
             echo "Running container..."
-            docker run -d --name $(containerName) `
-              --network $(networkName) `
-              -p $(exposedPort):8080 `
-              $(dockerHubRepo):api_latest
+            docker run -d --name $(containerName) --network $(networkName) -p $(exposedPort):8080 $(dockerHubRepo):api_latest
           displayName: 'Deploy API Container'
