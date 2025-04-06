@@ -11,35 +11,82 @@ variables:
   exposedPort: '8080'
 
 stages:
-- stage: DeployAPI
-  displayName: Deploy API via Docker
+- stage: DeployToDev
+  displayName: Deploy to Dev (Mock)
   jobs:
-    - job: DeployJob
-      steps:
-        - task: Docker@2
-          displayName: 'Login to Docker Hub'
-          inputs:
-            command: login
-            containerRegistry: 'DockerHub'
+    - deployment: DevDeployment
+      displayName: Mock Deployment to Dev
+      environment: 'dev'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - script: echo "✅ Mock deploy to DEV environment. No Docker image will be pulled or run."
+                displayName: 'Mock Dev Deployment'
 
-        - script: |
-            echo "Creating Docker network if it does not exist..."
-            docker network inspect $(networkName) >nul 2>&1
-            if errorlevel 1 (
-              echo "Network does not exist. Creating..."
-              docker network create $(networkName)
-            ) else (
-              echo "Network $(networkName) already exists."
-            )
-          displayName: 'Ensure Docker Network Exists'
-          
-        - script: |
-            echo "Stopping and removing existing container if any..."
-            docker rm -f $(containerName) || echo "No container to remove."
+- stage: DeployToQA
+  displayName: Deploy to QA (Mock)
+  dependsOn: DeployToDev
+  jobs:
+    - deployment: QADeployment
+      displayName: Mock Deployment to QA
+      environment: 'RONALD-VM-Win11.RONALD-VM-X'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - script: echo "✅ Mock deploy to QA environment. No Docker image will be pulled or run."
+                displayName: 'Mock QA Deployment'
 
-            echo "Pulling latest image..."
-            docker pull $(dockerHubRepo):api_latest
+- stage: DeployToStaging
+  displayName: Deploy to Staging (Mock)
+  dependsOn: DeployToQA
+  jobs:
+    - deployment: StagingDeployment
+      displayName: Mock Deployment to Staging
+      environment: 'RONALD-VM-Win11.RONALD-VM-X'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - script: echo "✅ Mock deploy to STAGING environment. No Docker image will be pulled or run."
+                displayName: 'Mock Staging Deployment'
 
-            echo "Running container..."
-            docker run -d --name $(containerName) --network $(networkName) -p $(exposedPort):8080 $(dockerHubRepo):api_latest
-          displayName: 'Deploy API Container'
+- stage: DeployToProd
+  displayName: Deploy to Prod (REAL)
+  dependsOn: DeployToStaging
+  jobs:
+    - deployment: ProdDeployment
+      displayName: Real Deployment to Prod
+      environment: 'RONALD-VM-Win11.RONALD-VM-X'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - task: Docker@2
+                displayName: 'Login to Docker Hub'
+                inputs:
+                  command: login
+                  containerRegistry: 'DockerHub'
+
+              - script: |
+                  echo "🔍 Checking Docker network: $(networkName)..."
+                  docker network inspect $(networkName) >nul 2>&1
+                  if errorlevel 1 (
+                    echo "⛔ Network not found. Creating..."
+                    docker network create $(networkName)
+                  ) else (
+                    echo "✅ Network $(networkName) already exists."
+                  )
+                displayName: 'Ensure Docker Network Exists'
+
+              - script: |
+                  echo "🛑 Stopping existing API container if any..."
+                  docker rm -f $(containerName) >nul 2>&1 || echo "No existing container to remove."
+
+                  echo "⬇️ Pulling Docker image: $(dockerHubRepo):$(shortSha)"
+                  docker pull $(dockerHubRepo):$(shortSha)
+
+                  echo "🚀 Running container: $(containerName) on port $(exposedPort)"
+                  docker run -d --name $(containerName) --network $(networkName) -p $(exposedPort):8080 $(dockerHubRepo):$(shortSha)
+                displayName: 'Deploy API Container to PROD'
