@@ -16,7 +16,7 @@ stages:
   jobs:
     - deployment: DevDeployment
       displayName: Mock Deployment to Dev
-      environment: 'dev'
+      environment: 'RONALD-VM-Win11.RONALD-VM-X'
       strategy:
         runOnce:
           deploy:
