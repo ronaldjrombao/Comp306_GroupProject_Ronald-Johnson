@@ -9,6 +9,7 @@ variables:
   containerName: 'budget-api'
   networkName: 'comp367-net'
   exposedPort: '8080'
+  envToDeploy: 'PROD-Environment.RONALD-VM-X'
 
 stages:
 - stage: DeployToDev
@@ -16,7 +17,7 @@ stages:
   jobs:
     - deployment: DevDeployment
       displayName: Mock Deployment to Dev
-      environment: 'RONALD-VM-Win11.RONALD-VM-X'
+      environment: '$(envToDeploy)'
       strategy:
         runOnce:
           deploy:
@@ -30,7 +31,7 @@ stages:
   jobs:
     - deployment: QADeployment
       displayName: Mock Deployment to QA
-      environment: 'RONALD-VM-Win11.RONALD-VM-X'
+      environment: '$(envToDeploy)'
       strategy:
         runOnce:
           deploy:
@@ -44,7 +45,7 @@ stages:
   jobs:
     - deployment: StagingDeployment
       displayName: Mock Deployment to Staging
-      environment: 'RONALD-VM-Win11.RONALD-VM-X'
+      environment: '$(envToDeploy)'
       strategy:
         runOnce:
           deploy:
@@ -58,7 +59,7 @@ stages:
   jobs:
     - deployment: ProdDeployment
       displayName: Real Deployment to Prod
-      environment: 'RONALD-VM-Win11.RONALD-VM-X'
+      environment: '$(envToDeploy)'
       strategy:
         runOnce:
           deploy:
