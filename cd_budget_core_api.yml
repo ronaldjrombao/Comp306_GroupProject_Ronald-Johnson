@@ -85,8 +85,8 @@ stages:
                   docker rm -f $(containerName) >nul 2>&1 || echo "No existing container to remove."
 
                   echo "⬇️ Pulling Docker image: $(dockerHubRepo):$(shortSha)"
-                  docker pull $(dockerHubRepo):$(shortSha)
+                  docker pull $(dockerHubRepo):api_latest
 
                   echo "🚀 Running container: $(containerName) on port $(exposedPort)"
-                  docker run -d --name $(containerName) --network $(networkName) -p $(exposedPort):8080 $(dockerHubRepo):$(shortSha)
+                  docker run -d --name $(containerName) --network $(networkName) -p $(exposedPort):8080 $(dockerHubRepo):api_latest
                 displayName: 'Deploy API Container to PROD'
